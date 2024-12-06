@@ -5,6 +5,13 @@ a bit vector as the underlying sort structure as described in the book "Programm
 
 The sort should read a file filled with integers from 0 to a 1000000 (you can define the limit as you wish) separated by a new line.
 
+### Why
+
+Its a nice sorting trick, possibly the fastest and one where you can sort with partial data
+which can help not blowing the memory if you have millions of positive numbers to sort.
+
+The caveat is that is only suitable for positive integers without duplication.
+
 ### Usage
 
 To generate such a file you can use the command generate as in
