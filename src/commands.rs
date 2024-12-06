@@ -35,7 +35,8 @@ impl Command for GenerateCommand {
 
     fn run(&mut self) {
         // take 1/4 of numbers to make them more sparse (and less sequential)
-        let holes = self.end - self.start / 4;
+        let holes = (self.end - self.start) / 4;
+        println!("holes: {}", holes);
         self.generator.generate(self.start, self.end, holes);
     }
 }
