@@ -1,10 +1,10 @@
+use crate::constants;
+use crate::util::atoi;
 use core::str;
+use memmap::Mmap;
 use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
-use memmap::Mmap;
-use crate::util::atoi;
-use crate::constants;
 
 pub struct NumberFile {
     file: File,
@@ -12,11 +12,10 @@ pub struct NumberFile {
     mem: Option<Mmap>,
     rest: [u8; 255],
     rest_len: usize,
-    readed: usize
+    readed: usize,
 }
 
 impl NumberFile {
-
     pub fn create<'a>(path: &'a str) -> NumberFile {
         let file = File::create(path).expect("creation failed");
         let len = file.metadata().unwrap().len();
@@ -26,7 +25,7 @@ impl NumberFile {
             mem: None,
             rest: [0; 255],
             rest_len: 0,
-            readed: 0
+            readed: 0,
         }
     }
 
@@ -40,7 +39,7 @@ impl NumberFile {
             mem: Some(mem),
             rest: [0; 255],
             rest_len: 0,
-            readed: 0
+            readed: 0,
         }
     }
 
@@ -131,8 +130,7 @@ impl NumberFile {
 
     #[inline]
     fn as_number(&self, buf: &[u8]) -> i32 {
-        return atoi(unsafe {str::from_utf8_unchecked(buf)}.as_bytes());
+        return atoi(unsafe { str::from_utf8_unchecked(buf) }.as_bytes());
         //return chars.parse::<u32>().unwrap();
     }
-
 }

@@ -1,4 +1,3 @@
-
 // The size of the buffer for read and write
 pub const BUFFER_SIZE: usize = 16384;
 // the buffer size for the number array

@@ -12,7 +12,7 @@ impl SortAlgorithm for NativeSorter {
         NativeSorter {
             numbers: Vec::with_capacity(size),
             infile: NumberFile::open(&input_file),
-            outfile: NumberFile::create(&output_file)
+            outfile: NumberFile::create(&output_file),
         }
     }
     fn sort(&mut self) {
@@ -23,7 +23,6 @@ impl SortAlgorithm for NativeSorter {
 }
 
 impl NativeSorter {
-
     fn load_input(&mut self) {
         while self.infile.have_numbers() {
             let mut partial = self.infile.read_numbers().unwrap();
@@ -32,7 +31,7 @@ impl NativeSorter {
     }
 
     fn write_output(&mut self) {
-        self.outfile.write_numbers(&self.numbers.as_slice(), self.numbers.len());
+        self.outfile
+            .write_numbers(&self.numbers.as_slice(), self.numbers.len());
     }
-
 }

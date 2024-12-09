@@ -23,7 +23,7 @@ sorter generate numbers.txt
 and then sort then to a output file with the bitvec sorter with something like
 
 ```
-sorter sort number.txt sorted.txt
+sorter sort bit number.txt sorted.txt
 ```
 
 which will create the file with the sorted numbers in the 'sorted.txt' file.
@@ -34,13 +34,17 @@ You can also check if any number is missing with
 sorter check number.txt sorted.txt
 ```
 
-For comparison i also implemented a sorter using the rust vector sorter that you can try with
+For comparison i also implemented a sorter using the rust vector sorter and a radix sort
 
 ```
-sorter sort number.txt sorted.txt native
+sorter sort rust number.txt sorted.txt
 ```
+and
+```
+sorter sort radix number.txt sorted.txt
+```
+respectively
 
-(need to fix the command line parameters parsing, so sorry for that)
 
 ### Building
 
@@ -48,11 +52,9 @@ sorter sort number.txt sorted.txt native
 cargo build --release
 ```
 
-For the best performance
-
 ### Notes
 
-Theres no proper hardnening in the processing of the input. It expects a well formatted input file
+Theres no proper hardening in the processing of the input. It expects a well formatted input file
 with a list of integers separated by a line end. Anything different than that and the program will break.
 To facilitate the checking the generate creates a list of N integers creating some gaps and then shuffles them.
 

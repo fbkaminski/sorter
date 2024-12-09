@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::number_file::NumberFile;
-use bitvec::prelude::*;
 use crate::number_sorter::SortAlgorithm;
+use bitvec::prelude::*;
 
 pub struct BitSorter {
     bits: BitVec,
@@ -14,7 +14,7 @@ impl SortAlgorithm for BitSorter {
         BitSorter {
             bits: bitvec![0; size],
             infile: NumberFile::open(&input_file),
-            outfile: NumberFile::create(&output_file)
+            outfile: NumberFile::create(&output_file),
         }
     }
     fn sort(&mut self) {
@@ -24,7 +24,6 @@ impl SortAlgorithm for BitSorter {
 }
 
 impl BitSorter {
-
     fn load_input(&mut self) {
         while self.infile.have_numbers() {
             let numbers = self.infile.read_numbers().unwrap();
@@ -53,5 +52,4 @@ impl BitSorter {
             self.outfile.write_numbers(&numbers, offset);
         }
     }
-
 }

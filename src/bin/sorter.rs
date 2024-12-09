@@ -1,56 +1,42 @@
-use std::env;
+use sorter::commands::{Commands, SortStrategy};
 use std::time::Instant;
-use sorter::commands::{Command, Commands, SortStrategy};
+use clap::{Parser, Subcommand};
+
+#[derive(Parser)]
+#[command(author = "Fabio Kaminski", version, about = "simple integer sorter")]
+struct Args {
+    #[clap(subcommand)]
+    cmd: Action
+}
+
+#[derive(Subcommand, Debug, Clone)]
+enum Action {
+    GENERATE{ file: String},
+    SORT{strategy: String, input: String, output: String},
+    CHECK{input: String, output: String}
+}
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let mut command: Box<dyn Command>;
-    if args.len() == 1 {
-        println!("sorter: invalid number of arguments");
-        return;
-    }
+    let args = Args::parse();
+    let mut command = match args.cmd.clone() {
+        Action::CHECK { input, output } => Commands::compare(input.as_str(), output.as_str()),
+        Action::SORT { strategy, input, output } =>  {
+            let strategy_algo = match strategy.as_str() {
+                "rust" => {SortStrategy::NATIVE},
+                "radix" => {SortStrategy::RADIX}
+                "bit" => {SortStrategy::BITSORT}
+                _ => {SortStrategy::BITSORT}
+            };
+            println!("sorting using {:?} algorithm", strategy_algo);
+            Commands::sort(strategy_algo, input.as_str(), output.as_str())
+        },
+        Action::GENERATE { file } => {Commands::generate(file.as_str(), 1, 1_000_000 - 1)}
+    };
     let start = Instant::now();
-    match args[1].as_str() {
-        "generate" => {
-            if args.len() < 3 {
-                println!("generate: invalid number of arguments");
-                return;
-            }
-            let output_file = args[2].as_str();
-            command = Commands::generate(output_file, 1, 1_000_000-1);
-        }
-        "sort" => {
-            if args.len() < 4 {
-                println!("sort: invalid number of arguments");
-                return;
-            }
-            let input_file = args[2].as_str();
-            let output_file = args[3].as_str();
-            let mut strategy = SortStrategy::BITSORT;
-            if args.len() >= 5 {
-                let strategy_str = args[4].as_str();
-                if strategy_str == "native" {
-                    println!("using rust sort to sort the numbers");
-                    strategy = SortStrategy::NATIVE;
-                }
-            }
-            command = Commands::sort(strategy, input_file, output_file);
-        }
-        "check" => {
-            if args.len() < 4 {
-                println!("check: invalid number of arguments");
-                return;
-            }
-            let input_file = args[2].as_str();
-            let output_file = args[3].as_str();
-            command = Commands::compare(input_file, output_file);
-        }
-        _ => {
-            println!("command not found");
-            return;
-        }
-    }
     command.run();
-    println!("Time elapsed in {}: {:?}", args[1].as_str(), start.elapsed());
+    println!(
+        "time elapsed: {:?}",
+        start.elapsed()
+    );
     return;
 }
