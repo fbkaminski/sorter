@@ -11,16 +11,16 @@ struct Args {
 
 #[derive(Subcommand, Debug, Clone)]
 enum Action {
-    GENERATE{ file: String},
-    SORT{strategy: String, input: String, output: String},
-    CHECK{input: String, output: String}
+    Generate{ file: String},
+    Sort{strategy: String, input: String, output: String},
+    Check{input: String, output: String}
 }
 
 fn main() {
     let args = Args::parse();
     let mut command = match args.cmd.clone() {
-        Action::CHECK { input, output } => Commands::compare(input.as_str(), output.as_str()),
-        Action::SORT { strategy, input, output } =>  {
+        Action::Check { input, output } => Commands::compare(input.as_str(), output.as_str()),
+        Action::Sort { strategy, input, output } =>  {
             let strategy_algo = match strategy.as_str() {
                 "rust" => {SortStrategy::NATIVE},
                 "radix" => {SortStrategy::RADIX}
@@ -30,7 +30,7 @@ fn main() {
             println!("sorting using {:?} algorithm", strategy_algo);
             Commands::sort(strategy_algo, input.as_str(), output.as_str())
         },
-        Action::GENERATE { file } => {Commands::generate(file.as_str(), 1, 1_000_000 - 1)}
+        Action::Generate { file } => {Commands::generate(file.as_str(), 1, 1_000_000 - 1)}
     };
     let start = Instant::now();
     command.run();
@@ -38,5 +38,4 @@ fn main() {
         "time elapsed: {:?}",
         start.elapsed()
     );
-    return;
 }

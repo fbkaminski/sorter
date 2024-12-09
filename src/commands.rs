@@ -25,9 +25,9 @@ pub struct GenerateCommand {
 impl GenerateCommand {
     pub fn create(output_file: &str, start: u32, end: u32) -> GenerateCommand {
         GenerateCommand {
-            generator: NumberGenerator::create(&output_file),
-            start: start,
-            end: end,
+            generator: NumberGenerator::create(output_file),
+            start,
+            end,
         }
     }
 }
@@ -36,7 +36,6 @@ impl Command for GenerateCommand {
     fn run(&mut self) {
         // take 1/4 of numbers to make them more sparse (and less sequential)
         let holes = (self.end - self.start) / 4;
-        println!("holes: {}", holes);
         self.generator.generate(self.start, self.end, holes);
     }
 }
@@ -48,7 +47,7 @@ pub struct BitSortCommand {
 impl BitSortCommand {
     pub fn new(input_file: &str, output_file: &str) -> BitSortCommand {
         BitSortCommand {
-            sorter: NumberSorter::create(1_000_000, &input_file, &output_file),
+            sorter: NumberSorter::create(1_000_000, input_file, output_file),
         }
     }
 }
@@ -66,7 +65,7 @@ pub struct RadixSortCommand {
 impl RadixSortCommand {
     pub fn new(input_file: &str, output_file: &str) -> RadixSortCommand {
         RadixSortCommand {
-            sorter: NumberSorter::create(1_000_000, &input_file, &output_file),
+            sorter: NumberSorter::create(1_000_000, input_file, output_file),
         }
     }
 }
@@ -84,7 +83,7 @@ pub struct NativeSortCommand {
 impl NativeSortCommand {
     pub fn new(input_file: &str, output_file: &str) -> NativeSortCommand {
         NativeSortCommand {
-            sorter: NumberSorter::create(1_000_000, &input_file, &output_file),
+            sorter: NumberSorter::create(1_000_000, input_file, output_file),
         }
     }
 }
@@ -117,7 +116,7 @@ impl Command for CompareCommand {
             .comparator
             .compare(self.input_file.as_str(), self.output_file.as_str())
             .unwrap();
-        if diff.len() > 0 {
+        if !diff.is_empty() {
             println!("elements missing: {:?}", diff);
         } else {
             println!("no elements missing");
@@ -129,11 +128,11 @@ pub struct Commands;
 
 impl Commands {
     pub fn sort(strategy: SortStrategy, input_file: &str, output_file: &str) -> Box<dyn Command> {
-        return match strategy {
+        match strategy {
             SortStrategy::BITSORT => Box::new(BitSortCommand::new(input_file, output_file)),
             SortStrategy::RADIX => Box::new(RadixSortCommand::new(input_file, output_file)),
             SortStrategy::NATIVE => Box::new(NativeSortCommand::new(input_file, output_file)),
-        };
+        }
     }
 
     pub fn compare(input_file: &str, output_file: &str) -> Box<dyn Command> {

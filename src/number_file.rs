@@ -16,12 +16,12 @@ pub struct NumberFile {
 }
 
 impl NumberFile {
-    pub fn create<'a>(path: &'a str) -> NumberFile {
+    pub fn create(path: &str) -> NumberFile {
         let file = File::create(path).expect("creation failed");
         let len = file.metadata().unwrap().len();
         NumberFile {
-            file: file,
-            len: len,
+            file,
+            len,
             mem: None,
             rest: [0; 255],
             rest_len: 0,
@@ -29,13 +29,13 @@ impl NumberFile {
         }
     }
 
-    pub fn open<'a>(path: &'a str) -> NumberFile {
+    pub fn open(path: &str) -> NumberFile {
         let file = File::open(path).expect("open failed");
         let len = file.metadata().unwrap().len();
         let mem = unsafe { Mmap::map(&file).unwrap() };
         NumberFile {
-            file: file,
-            len: len,
+            file,
+            len,
             mem: Some(mem),
             rest: [0; 255],
             rest_len: 0,
@@ -61,7 +61,7 @@ impl NumberFile {
             }
             return Some(numbers);
         }
-        return None;
+        None
     }
 
     fn read_numbers_from_buffer(&mut self, start: usize, end: usize) -> Vec<u32> {
@@ -88,9 +88,9 @@ impl NumberFile {
 
         let buf = &self.mem.as_ref().unwrap()[start..end];
 
-        for i in 0..buf.len() {
+        for (i, digit) in buf.iter().enumerate() {
             let is_eof = readed < constants::BUFFER_SIZE && i == readed;
-            if buf[i] == b'\n' || is_eof {
+            if *digit == b'\n' || is_eof {
                 let n = self.as_number(&line[0..offset]);
                 result.push(n as u32);
                 offset = 0;
@@ -99,7 +99,7 @@ impl NumberFile {
                     break;
                 }
             } else {
-                line[offset] = buf[i];
+                line[offset] = *digit;
                 offset += 1;
             }
         }
@@ -109,13 +109,13 @@ impl NumberFile {
             self.rest_len = offset;
             self.rest[offset] = b'\0';
         }
-        return result;
+        result
     }
 
     pub fn write_numbers(&mut self, numbers: &[u32], len: usize) {
         let mut content = String::new();
-        for i in 0..len {
-            content.push_str(numbers[i].to_string().as_str());
+        for number in numbers.iter().take(len) {
+            content.push_str(number.to_string().as_str());
             content.push('\n');
         }
         let _ = self.file.write_all(content.as_bytes());

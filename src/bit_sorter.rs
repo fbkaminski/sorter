@@ -13,8 +13,8 @@ impl SortAlgorithm for BitSorter {
     fn create(size: usize, input_file: &str, output_file: &str) -> Self {
         BitSorter {
             bits: bitvec![0; size],
-            infile: NumberFile::open(&input_file),
-            outfile: NumberFile::create(&output_file),
+            infile: NumberFile::open(input_file),
+            outfile: NumberFile::create(output_file),
         }
     }
     fn sort(&mut self) {

@@ -11,8 +11,8 @@ impl SortAlgorithm for RadixSorter {
     fn create(size: usize, input_file: &str, output_file: &str) -> Self {
         RadixSorter {
             numbers: Vec::with_capacity(size),
-            infile: NumberFile::open(&input_file),
-            outfile: NumberFile::create(&output_file),
+            infile: NumberFile::open(input_file),
+            outfile: NumberFile::create(output_file),
         }
     }
     fn sort(&mut self) {
@@ -32,7 +32,7 @@ impl RadixSorter {
 
     fn write_output(&mut self) {
         self.outfile
-            .write_numbers(&self.numbers.as_slice(), self.numbers.len());
+            .write_numbers(self.numbers.as_slice(), self.numbers.len());
     }
 
     fn radix_sort(&mut self) {
@@ -51,7 +51,7 @@ impl RadixSorter {
                 max = self.numbers[i];
             }
         }
-        return max;
+        max
     }
 
     fn count_sort(&mut self, exp: u32) {
@@ -82,8 +82,6 @@ impl RadixSorter {
         // Copy the output array to arr[],
         // so that arr[] now contains sorted
         // numbers according to current digit
-        for i in 0..n {
-            self.numbers[i] = output[i];
-        }
+        self.numbers[..n].copy_from_slice(&output[..n]);
     }
 }

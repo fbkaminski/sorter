@@ -31,6 +31,6 @@ impl NumberGenerator {
         for index in indices_to_remove {
             numbers.remove(index);
         }
-        return numbers;
+        numbers
     }
 }

@@ -11,8 +11,8 @@ impl SortAlgorithm for NativeSorter {
     fn create(size: usize, input_file: &str, output_file: &str) -> Self {
         NativeSorter {
             numbers: Vec::with_capacity(size),
-            infile: NumberFile::open(&input_file),
-            outfile: NumberFile::create(&output_file),
+            infile: NumberFile::open(input_file),
+            outfile: NumberFile::create(output_file),
         }
     }
     fn sort(&mut self) {
@@ -32,6 +32,6 @@ impl NativeSorter {
 
     fn write_output(&mut self) {
         self.outfile
-            .write_numbers(&self.numbers.as_slice(), self.numbers.len());
+            .write_numbers(self.numbers.as_slice(), self.numbers.len());
     }
 }

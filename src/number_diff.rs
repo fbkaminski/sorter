@@ -10,10 +10,10 @@ impl NumberDiff {
         NumberDiff {}
     }
 
-    pub fn compare<'a, 'b>(
+    pub fn compare(
         &mut self,
-        input_file: &'a str,
-        output_file: &'b str,
+        input_file: &str,
+        output_file: &str,
     ) -> Option<Vec<u32>> {
         let mut icontents = String::new();
         let mut ifile = File::open(input_file).expect("open failed");
@@ -39,6 +39,6 @@ impl NumberDiff {
         let sdiff: SymmetricDifference<'_, u32, std::hash::RandomState> =
             iset.symmetric_difference(&oset);
         let vec: Vec<u32> = sdiff.cloned().collect();
-        return Some(vec.iter().map(|&x| x).collect());
+        Some(vec.to_vec())
     }
 }
