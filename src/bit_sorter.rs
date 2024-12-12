@@ -42,7 +42,6 @@ impl BitSorter {
                 offset += 1;
                 if offset >= constants::NBUFFER_SIZE {
                     self.outfile.write_numbers(&numbers, offset);
-                    numbers.fill(0);
                     offset = 0;
                 }
             }

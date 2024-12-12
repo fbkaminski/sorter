@@ -2,7 +2,7 @@ use crate::number_file::NumberFile;
 use crate::number_sorter::SortAlgorithm;
 
 pub struct RadixSorter {
-    numbers: Vec<u32>,
+    size: usize,
     infile: NumberFile,
     outfile: NumberFile,
 }
@@ -10,60 +10,57 @@ pub struct RadixSorter {
 impl SortAlgorithm for RadixSorter {
     fn create(size: usize, input_file: &str, output_file: &str) -> Self {
         RadixSorter {
-            numbers: Vec::with_capacity(size),
+            size,
             infile: NumberFile::open(input_file),
             outfile: NumberFile::create(output_file),
         }
     }
     fn sort(&mut self) {
-        self.load_input();
-        self.radix_sort();
-        self.write_output();
+        self.load_and_sort();
     }
 }
 
 impl RadixSorter {
-    fn load_input(&mut self) {
+
+    fn load_and_sort(&mut self) {
+        let mut numbers: Vec<u32> = Vec::with_capacity(self.size);
         while self.infile.have_numbers() {
             let mut partial = self.infile.read_numbers().unwrap();
-            self.numbers.append(&mut partial);
+            numbers.append(&mut partial);
         }
+        self.radix_sort(&mut numbers);
+        self.write_output(&numbers);
     }
 
-    fn write_output(&mut self) {
+    fn write_output(&mut self, arr: &Vec<u32>) {
         self.outfile
-            .write_numbers(self.numbers.as_slice(), self.numbers.len());
+            .write_numbers(arr.as_slice(), arr.len());
     }
 
-    fn radix_sort(&mut self) {
-        let max = self.get_max();
+    fn radix_sort(&self, arr: &mut Vec<u32>) {
+        let max = self.get_max(arr);
         let mut exp = 1;
         while max / exp > 0 {
-            self.count_sort(exp);
+            let sorted = self.sort_by(arr, exp);
+            arr[..sorted.len()].copy_from_slice(&sorted[..sorted.len()]);
             exp *= 10;
         }
     }
 
-    fn get_max(&self) -> u32 {
-        let mut max = self.numbers[0];
-        for i in 0..self.numbers.len() {
-            if self.numbers[i] > max {
-                max = self.numbers[i];
-            }
-        }
-        max
+    // fixme: we can use iter.map() for this
+    fn get_max(&self, arr: &Vec<u32>) -> u32 {
+        *arr.iter().max().unwrap()
     }
 
-    fn count_sort(&mut self, exp: u32) {
+    fn sort_by(&self, arr: &mut Vec<u32>, exp: u32) -> Vec<u32> {
         // Output array
-        let n = self.numbers.len();
-        let mut output: Vec<u32> = vec![0; n];
+        let mut output: Vec<u32> = vec![0; arr.len()];
         let mut count: [u32; 10] = [0; 10];
 
         // Store count of occurrences
         // in count[]
-        for i in 0..n {
-            count[((self.numbers[i] / exp) % 10) as usize] += 1;
+        for i in 0..arr.len() {
+            count[((arr[i] / exp) % 10) as usize] += 1;
         }
 
         // Change count[i] so that count[i]
@@ -74,14 +71,11 @@ impl RadixSorter {
         }
 
         // Build the output array
-        for i in (0..n).rev() {
-            output[(count[((self.numbers[i] / exp) % 10) as usize] - 1) as usize] = self.numbers[i];
-            count[((self.numbers[i] / exp) % 10) as usize] -= 1;
+        for i in (0..arr.len()).rev() {
+            output[(count[((arr[i] / exp) % 10) as usize] - 1) as usize] = arr[i];
+            count[((arr[i] / exp) % 10) as usize] -= 1;
         }
 
-        // Copy the output array to arr[],
-        // so that arr[] now contains sorted
-        // numbers according to current digit
-        self.numbers[..n].copy_from_slice(&output[..n]);
+        return output;
     }
 }
